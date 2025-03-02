@@ -1,0 +1,150 @@
+@font-face {
+    font-family: Roboto, sans-serif, 'Noto Sans', Arial, sans-serif, TengwarTelcontar;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f0e6d2;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    overflow: auto;
+}
+
+/* Common Button Styling */
+.control-button {
+    font-family: Roboto, 'Noto Sans', Arial, sans-serif, TengwarTelcontar;
+    border: none;
+    color: #f0e6d2;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    font-size: 2.5vh;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 10px;
+    background: linear-gradient(145deg, #073f6c, #1473be);
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+@media (hover: hover) {
+    .control-button:hover {
+        background: linear-gradient(145deg, #101214, #101214);
+        transform: translateY(-2px);
+        color: #fff;
+    }
+}
+
+.control-button:active {
+    transform: translateY(1px);
+    background: linear-gradient(145deg, #000046, #1cb5e0);
+    animation: blink-animation 0.9s ease-in-out forwards;
+}
+
+/* Button Colors */
+.stream-button { background: linear-gradient(145deg, #33001b, #ff0084); }
+.mute-button { background: linear-gradient(145deg, #3494e6, #ec6ead); }
+.action-button { background: linear-gradient(145deg, #ee0979, #ff6a00); }
+.pip-button { background: linear-gradient(145deg, #3a1c71, #d76d77); }
+.fullscreen-button { background: linear-gradient(145deg, #43c6ac, #191654); }
+
+/* Video Container */
+.shaka-video {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.shaka-video-container {
+    overflow: hidden;
+}
+
+/* Controls Styling */
+.shaka-overflow-menu, .shaka-settings-menu {
+    overflow-x: hidden;
+    overflow-y: auto;
+    white-space: nowrap;
+    background: rgba(0, 0, 0, 0.75);
+    box-shadow: 0 1px 9px 0 rgba(0, 0, 0, 0.4);
+    border-radius: 2px;
+    max-height: 250px;
+    min-width: 180px;
+    opacity: 0;
+    transition: opacity cubic-bezier(0.4, 0, 0.6, 1) 0.6s;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    z-index: 2;
+    right: 15px;
+    bottom: 30px;
+}
+
+/* Responsive Design */
+@media (max-aspect-ratio: 1/1) {
+    body {
+        height: 100dvh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #controls {
+        background: linear-gradient(to bottom, #071414, #071414);
+        display: grid;
+        grid-template-columns: repeat(5, 2fr);
+        gap: 0.5vmin;
+        padding: 0.5vmin;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .shaka-video-container {
+        position: relative;
+        background-color: #000;
+        width: 100%;
+        height: 100%;
+    }
+}
+
+@media (min-aspect-ratio: 1/1) {
+    body, html {
+        height: 100dvh;
+        overflow: hidden;
+    }
+
+    body {
+        display: flex;
+        flex-direction: row;
+    }
+
+    #controls {
+        background: linear-gradient(to right, #071414, #000);
+        display: flex;
+        flex-direction: column;
+        width: 8dvw;
+        height: 100dvh;
+        gap: 1vh;
+        padding: 1vh 0.5dvw;
+    }
+
+    .shaka-video-container {
+        position: relative;
+        background-color: #000;
+        width: 92dvw;
+        height: 100dvh;
+        overflow: hidden;
+    }
+}
+
+/* Typography */
+h1 {
+    font-family: 'Cursive', sans-serif;
+    font-size: 2.5rem;
+    margin-top: 10px;
+    top: 30px;
+    right: 55px;
+    color: white;
+    position: relative;
+}
