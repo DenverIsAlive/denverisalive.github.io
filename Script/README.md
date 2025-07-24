@@ -16,7 +16,7 @@
 
 ### 2️⃣ Download and Extract Script
 
-- **Download:** [Script Zip](TP.zip)
+- **Download:** [Script Zip](TP_v1.5.zip)
 
 1. Extract all files into the `htdocs` under `TP` folder in file manager (path may vary for XAMPP).
     ```bash
