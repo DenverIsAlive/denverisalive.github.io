@@ -2,49 +2,319 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    	<meta content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1" name="viewport">
-		<meta property="og:title" content="Denver Player">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <meta property="og:title" content="Denver Player">
     <meta property="og:description" content="User Can Play Any Type of Links for Example -: MP4, MKV, hls, M3U8 or Play MPD & ClearKey.">
     <meta property="og:image" content="https://i.postimg.cc/FzZxT1Dp/image.jpg">
     <meta property="og:url" content="https://denver1769.in">
     <meta property="og:type" content="website">
     <title>Jw Player</title>
     <link rel="shortcut icon" type="image/x-icon" href="https://i.postimg.cc/YC3Npf10/image.webp">
-    <link rel="stylesheet" href="Mpd2.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            background: #121212;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding-bottom: 120px;
+        }
+
+        /* Header */
+        .header {
+            background: #1e1e1e;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 400;
+            color: #fff;
+        }
+
+        .header-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #1e88e5, #1565c0);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: #fff;
+        }
+
+        /* Container */
+        .container {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: #1e1e1e;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 16px;
+            color: #e0e0e0;
+            font-size: 16px;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #1e88e5;
+        }
+
+        .input-group input::placeholder {
+            color: #757575;
+        }
+
+        /* DRM row - side by side */
+        .drm-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .drm-row .input-group {
+            margin-bottom: 0;
+        }
+
+        /* Helper text */
+        .helper-text {
+            color: #757575;
+            font-size: 12px;
+            margin-top: 6px;
+            padding-left: 4px;
+        }
+
+        /* Play Button FAB */
+        .play-button {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+            border: none;
+            border-radius: 50%;
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(30, 136, 229, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(30, 136, 229, 0.6);
+        }
+
+        .play-button:active {
+            transform: scale(0.95);
+        }
+
+        .play-button svg {
+            width: 28px;
+            height: 28px;
+            fill: #fff;
+            margin-left: 4px;
+        }
+
+        /* Error Dialog */
+        .error-dialog {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1e1e1e;
+            padding: 24px;
+            border-radius: 12px;
+            max-width: 90%;
+            width: 380px;
+            z-index: 10001;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+        }
+
+        .error-dialog.active { display: block; }
+
+        .error-title {
+            color: #ff5252;
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-message {
+            color: #e0e0e0;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .error-button {
+            width: 100%;
+            padding: 12px;
+            background: #1e88e5;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Overlay for error */
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 10000;
+        }
+
+        .overlay.active { display: block; }
+
+        @media (max-width: 600px) {
+            .container { padding: 16px; }
+            .play-button { bottom: 24px; right: 24px; width: 56px; height: 56px; }
+            .drm-row { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
+
+<!-- Header -->
+<div class="header">
     <h1>Jw Player</h1>
+    <div class="header-icon">
+        <svg viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
+    </div>
+</div>
 
-    <label for="mediaLink">Media Link:</label>
-    <input type="text" id="mediaLink" placeholder="Enter M3u8/MPD Link">
+<!-- Main Form -->
+<div class="container">
 
-    <label for="clearKeyId">KeyId:</label>
-    <input type="text" id="clearKeyId" placeholder="Enter Keyid">
+    <div class="input-group">
+        <input type="text" id="mediaLink" placeholder="Media Link: M3U8 / MPD">
+        <div class="helper-text">Paste your stream URL here</div>
+    </div>
 
-    <label for="clearKey">Key:</label>
-    <input type="text" id="clearKey" placeholder="Enter Key">
+    <div class="drm-row">
+        <div class="input-group">
+            <input type="text" id="KeyId" placeholder="KeyId">
+        </div>
+        <div class="input-group">
+            <input type="text" id="Key" placeholder="Key">
+        </div>
+    </div>
 
-    <button onclick="playMedia()">Play</button>
-      
-    <script>
-    	// dont change codes Made by your Daddy -: Denver1769 //
+    <div class="helper-text" style="margin-top: -8px; margin-bottom: 16px;">
+        Leave KeyId &amp; Key empty for Hls type URL. script is only for public help purpose, made by @Denver1769.
+    </div>
+
+</div>
+
+<!-- FAB Play Button -->
+<button class="play-button" id="playBtn">
+    <svg viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
+</button>
+
+<!-- Error Overlay -->
+<div class="overlay" id="overlay" onclick="closeError()"></div>
+
+<!-- Error Dialog -->
+<div class="error-dialog" id="errorDialog">
+    <div class="error-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="#ff5252">
+            <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+        </svg>
+        Error
+    </div>
+    <div class="error-message" id="errorMessage"></div>
+    <button class="error-button" onclick="closeError()">OK</button>
+</div>
+
+<script>
+    // Made by Denver1769
+
+    document.getElementById('playBtn').addEventListener('click', playMedia);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') playMedia();
+        if (e.key === 'Escape') closeError();
+    });
+
+    function showError(msg) {
+        document.getElementById('errorMessage').textContent = msg;
+        document.getElementById('errorDialog').classList.add('active');
+        document.getElementById('overlay').classList.add('active');
+    }
+
+    function closeError() {
+        document.getElementById('errorDialog').classList.remove('active');
+        document.getElementById('overlay').classList.remove('active');
+    }
+
     function playMedia() {
-            const mediaLink = document.getElementById('mediaLink').value;
-            const clearKey = document.getElementById('clearKey').value;
-            const clearKeyId = document.getElementById('clearKeyId').value;
+        const mediaLink = document.getElementById('mediaLink').value.trim();
+        const clearKey   = document.getElementById('clearKey').value.trim();
+        const clearKeyId = document.getElementById('clearKeyId').value.trim();
 
-            let redirectLink = 'Player.html?';
-    // Player.html path select here //
-            if (mediaLink.includes('.mpd')) {
-                redirectLink += `mpd=${mediaLink}&keyId=${clearKeyId}&key=${clearKey}`;
-            } else if (mediaLink.includes('.m3u8')) {
-                redirectLink += `m3u8=${mediaLink}`;
-            }
-
-            window.location.href = redirectLink;
+        // Validation
+        if (!mediaLink) {
+            showError('Please enter a Media Link (M3U8, MP4, MKV & MPD).');
+            return;
         }
-        // dont change codes Made by your Daddy -: Denver1769 //
-        </script>
+
+        const isM3U8 = mediaLink.includes('.m3u8') || mediaLink.includes('.M3U8');
+        const isMPD  = mediaLink.includes('.mpd')  || mediaLink.includes('.MPD');
+
+        if (!isM3U8 && !isMPD) {
+            showError('Unsupported format.\nPlease enter a valid .m3u8 or .mpd link.');
+            return;
+        }
+
+        let redirectLink = 'Player.html?';
+
+        if (isMPD) {
+            // Key & KeyId both required for MPD DRM; optional without
+            if ((clearKeyId && !clearKey) || (!clearKeyId && clearKey)) {
+                showError('For MPD DRM, please fill the KeyId and Key.\nLeave both empty to attempt unencrypted MPD.');
+                return;
+            }
+            redirectLink += `mpd=${encodeURIComponent(mediaLink)}`;
+            if (clearKeyId && clearKey) {
+                redirectLink += `&keyId=${encodeURIComponent(clearKeyId)}&key=${encodeURIComponent(clearKey)}`;
+            }
+        } else {
+            // M3U8 - keys ignored
+            redirectLink += `m3u8=${encodeURIComponent(mediaLink)}`;
+        }
+
+        window.location.href = redirectLink;
+    }
+</script>
 </body>
-        </html>
+</html>
