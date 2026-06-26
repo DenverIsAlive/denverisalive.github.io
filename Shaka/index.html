@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network Stream Player</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Roboto', 'Segoe UI', sans-serif; background: #121212; color: #e0e0e0; min-height: 100vh; padding-bottom: 120px; }
+.header { background: #1e1e1e; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #2a2a2a; }
+.header h1 { font-size: 20px; font-weight: 400; color: #fff; }
+.history-icon { width: 28px; height: 28px; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }
+.history-icon:hover { opacity: 1; }
+.container { padding: 20px; max-width: 800px; margin: 0 auto; }
+.input-group { margin-bottom: 16px; }
+.input-group input, .input-group select, .input-group textarea {
+    width: 100%; background: #1e1e1e; border: 1px solid #3a3a3a; border-radius: 8px;
+    padding: 16px; color: #e0e0e0; font-size: 16px; transition: border-color 0.2s;
+    font-family: inherit;
+}
+.input-group textarea { resize: vertical; min-height: 90px; font-family: 'Courier New', monospace; font-size: 14px; }
+.input-group input:focus, .input-group select:focus, .input-group textarea:focus { outline: none; border-color: #1e88e5; }
+.input-group input::placeholder, .input-group textarea::placeholder { color: #757575; }
+.dropdown-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.dropdown-box { background: #1e1e1e; border: 1px solid #3a3a3a; border-radius: 8px; padding: 12px 16px; position: relative; }
+.dropdown-label { color: #1e88e5; font-size: 12px; margin-bottom: 6px; display: block; }
+.dropdown-box select { width: 100%; background: transparent; border: none; color: #e0e0e0; font-size: 16px; padding: 4px 0; cursor: pointer; }
+.dropdown-box select:focus { outline: none; }
+.dropdown-box select option { background: #1e1e1e; color: #e0e0e0; }
+.section-title { color: #1e88e5; font-size: 14px; margin-bottom: 8px; margin-top: 8px; font-weight: 500; }
+.play-button {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+    border: none; border-radius: 50%;
+    position: fixed; bottom: 32px; right: 32px;
+    cursor: pointer; box-shadow: 0 4px 12px rgba(30, 136, 229, 0.4);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s; z-index: 100;
+}
+.play-button:hover { transform: scale(1.1); box-shadow: 0 6px 16px rgba(30, 136, 229, 0.6); }
+.play-button:active { transform: scale(0.95); }
+.play-button svg { width: 28px; height: 28px; fill: #fff; margin-left: 4px; }
+.player-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; }
+.player-modal.active { display: block; }
+.player-header { background: #1e1e1e; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+.player-title { color: #fff; font-size: 18px; flex: 1; margin: 0 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.close-button { width: 32px; height: 32px; background: transparent; border: none; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; }
+.close-button svg { width: 24px; height: 24px; fill: #fff; }
+.video-container { width: 100%; height: calc(100% - 56px); background: #000; position: relative; }
+.video-container video { width: 100%; height: 100%; object-fit: contain; }
+.loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center; }
+.loading-overlay.active { display: flex; }
+.spinner { width: 50px; height: 50px; border: 4px solid rgba(30,136,229,0.3); border-top-color: #1e88e5; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-dialog { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e1e; padding: 24px; border-radius: 12px; max-width: 90%; width: 400px; z-index: 10001; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
+.error-dialog.active { display: block; }
+.error-title { color: #ff5252; font-size: 18px; margin-bottom: 12px; }
+.error-message { color: #e0e0e0; margin-bottom: 20px; line-height: 1.5; word-break: break-word; }
+.error-button { width: 100%; padding: 12px; background: #1e88e5; color: #fff; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+.custom-ua-row { display: none; margin-bottom: 16px; }
+.custom-ua-row.active { display: block; }
+.helper-text { color: #757575; font-size: 12px; margin-top: 4px; }
+@media (max-width: 600px) {
+    .container { padding: 16px; }
+    .dropdown-row { grid-template-columns: 1fr; }
+    .play-button { bottom: 24px; right: 24px; width: 56px; height: 56px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Network Stream (Video) Player</h1>
+    <svg class="history-icon" viewBox="0 0 24 24">
+        <path fill="#e0e0e0" d="M13,3A9,9 0 0,0 4,12H1L4.89,15.89L4.96,16.03L9,12H6A7,7 0 0,1 13,5A7,7 0 0,1 20,12A7,7 0 0,1 13,19C11.07,19 9.32,18.21 8.06,16.94L6.64,18.36C8.27,20 10.5,21 13,21A9,9 0 0,0 22,12A9,9 0 0,0 13,3Z"/>
+    </svg>
+</div>
+
+<div class="container">
+    <form id="streamForm">
+        <div class="input-group">
+            <input type="text" id="streamUrl" placeholder="Media Stream URL" required>
+            <div class="helper-text">Support complex URLs like: url|cookie=...&user-agent=...&origin=...</div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="cookieValue" placeholder="Cookie Value">
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="refererValue" placeholder="Referer Value">
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="originValue" placeholder="Origin Value">
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="drmLicense" placeholder="DRM License URL or ClearKey (KID:KEY)">
+        </div>
+
+        <div class="dropdown-row">
+            <div class="dropdown-box">
+                <label class="dropdown-label">UserAgent</label>
+                <select id="userAgent">
+                    <option value="">Default</option>
+                    <option value="chrome_desktop">Chrome Desktop</option>
+                    <option value="chrome_android">Chrome Android</option>
+                    <option value="firefox">Firefox</option>
+                    <option value="safari">Safari</option>
+                    <option value="edge">Edge</option>
+                    <option value="custom">Custom...</option>
+                </select>
+            </div>
+
+            <div class="dropdown-box">
+                <label class="dropdown-label">DrmScheme</label>
+                <select id="drmScheme">
+                    <option value="clearkey">clearkey</option>
+                    <option value="widevine">widevine</option>
+                    <option value="playready">playready</option>
+                    <option value="fairplay">fairplay</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="custom-ua-row" id="customUaRow">
+            <div class="input-group">
+                <input type="text" id="customUserAgent" placeholder="Custom User-Agent string">
+            </div>
+        </div>
+
+        <div class="section-title">Custom Headers (JSON Format)</div>
+        <div class="input-group">
+            <textarea id="customHeaders" placeholder='{ "X-Forwarded-For": "1.178.20.23", "Authorization": "Bearer xxx" }'></textarea>
+            <div class="helper-text">Script by @Denver1769 • Enter valid JSON for additional headers</div>
+        </div>
+    </form>
+</div>
+
+<button class="play-button" id="playButton">
+    <svg viewBox="0 0 24 24"><path d="M8,5.14V19.14L19,12.14L8,5.14Z"/></svg>
+</button>
+
+<div class="player-modal" id="playerModal">
+    <div class="player-header">
+        <button class="close-button" id="closeButton">
+            <svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>
+        </button>
+        <div class="player-title" id="playerTitle">stream</div>
+    </div>
+    <div class="video-container" data-shaka-player-container>
+        <video id="video" autoplay data-shaka-player></video>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+</div>
+
+<div class="error-dialog" id="errorDialog">
+    <div class="error-title">Error</div>
+    <div class="error-message" id="errorMessage"></div>
+    <button class="error-button" onclick="closeError()">OK</button>
+</div>
+
+<script>
+const userAgents = {
+    chrome_desktop: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+    chrome_android: 'Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36',
+    firefox: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0',
+    safari: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.2 Safari/605.1.15',
+    edge: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
+};
+
+let player = null;
+let ui = null;
+
+// Show/hide custom UA input
+document.getElementById('userAgent').addEventListener('change', (e) => {
+    const row = document.getElementById('customUaRow');
+    if (e.target.value === 'custom') row.classList.add('active');
+    else row.classList.remove('active');
+});
+
+// Auto-parse complex stream URLs
+function parseStreamInput(input) {
+    const result = {
+        url: '',
+        cookie: '',
+        referer: '',
+        origin: '',
+        userAgent: '',
+        drmScheme: '',
+        drmLicense: '',
+        customHeaders: {}
+    };
+
+    if (!input.includes('|')) {
+        result.url = input.trim();
+        return result;
+    }
+
+    const parts = input.split('|');
+    result.url = parts[0].trim();
+    
+    if (parts.length < 2) return result;
+
+    const params = parts[1];
+    
+    // Parse parameters (case-insensitive)
+    const paramRegex = /(\w+[-\w]*)\s*=\s*([^&]+)/gi;
+    let match;
+    
+    while ((match = paramRegex.exec(params)) !== null) {
+        const key = match[1].toLowerCase().trim();
+        const value = match[2].trim();
+        
+        if (key === 'cookie') {
+            result.cookie = value;
+        } else if (key === 'user-agent' || key === 'useragent') {
+            result.userAgent = value;
+        } else if (key === 'referer') {
+            result.referer = value;
+        } else if (key === 'origin') {
+            result.origin = value;
+        } else if (key === 'drmscheme') {
+            result.drmScheme = value.toLowerCase();
+        } else if (key === 'drmlicense') {
+            result.drmLicense = value;
+        } else {
+            // Custom header
+            result.customHeaders[match[1].trim()] = value;
+        }
+    }
+    
+    return result;
+}
+
+// Auto-fill form from parsed data
+function autoFillForm(parsed) {
+    if (parsed.cookie) document.getElementById('cookieValue').value = parsed.cookie;
+    if (parsed.referer) document.getElementById('refererValue').value = parsed.referer;
+    if (parsed.origin) document.getElementById('originValue').value = parsed.origin;
+    if (parsed.drmLicense) document.getElementById('drmLicense').value = parsed.drmLicense;
+    
+    if (parsed.userAgent) {
+        document.getElementById('userAgent').value = 'custom';
+        document.getElementById('customUaRow').classList.add('active');
+        document.getElementById('customUserAgent').value = parsed.userAgent;
+    }
+    
+    if (parsed.drmScheme && ['clearkey', 'widevine', 'playready', 'fairplay'].includes(parsed.drmScheme)) {
+        document.getElementById('drmScheme').value = parsed.drmScheme;
+    }
+    
+    if (Object.keys(parsed.customHeaders).length > 0) {
+        const existing = document.getElementById('customHeaders').value.trim();
+        let headers = {};
+        
+        if (existing) {
+            try { headers = JSON.parse(existing); } catch(e) {}
+        }
+        
+        Object.assign(headers, parsed.customHeaders);
+        document.getElementById('customHeaders').value = JSON.stringify(headers, null, 2);
+    }
+}
+
+document.getElementById('playButton').addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    let streamUrl = document.getElementById('streamUrl').value.trim();
+    
+    if (!streamUrl) { 
+        showError('Please enter Media Stream URL'); 
+        return; 
+    }
+    
+    // Auto-parse if contains |
+    if (streamUrl.includes('|')) {
+        const parsed = parseStreamInput(streamUrl);
+        streamUrl = parsed.url;
+        document.getElementById('streamUrl').value = parsed.url;
+        autoFillForm(parsed);
+    }
+
+    const cookieValue = document.getElementById('cookieValue').value.trim();
+    const refererValue = document.getElementById('refererValue').value.trim();
+    const originValue = document.getElementById('originValue').value.trim();
+    const drmLicense = document.getElementById('drmLicense').value.trim();
+    const userAgentType = document.getElementById('userAgent').value;
+    const customUA = document.getElementById('customUserAgent').value.trim();
+    const drmScheme = document.getElementById('drmScheme').value;
+    const customHeadersText = document.getElementById('customHeaders').value.trim();
+
+    // Parse custom headers
+    let customHeaders = {};
+    if (customHeadersText) {
+        try {
+            customHeaders = JSON.parse(customHeadersText);
+            if (typeof customHeaders !== 'object' || Array.isArray(customHeaders) || customHeaders === null) {
+                throw new Error('Headers must be a JSON object');
+            }
+        } catch (err) {
+            showError('Invalid Custom Headers JSON: ' + err.message);
+            return;
+        }
+    }
+
+    document.getElementById('loadingOverlay').classList.add('active');
+
+    try {
+        await initPlayer({
+            streamUrl, cookie: cookieValue, referer: refererValue, origin: originValue,
+            drmUrl: drmLicense, userAgentType, customUA, drmScheme, customHeaders
+        });
+    } catch (error) {
+        console.error(error);
+        showError('Failed to load stream: ' + (error.message || error));
+        document.getElementById('loadingOverlay').classList.remove('active');
+    }
+});
+
+async function initPlayer(opts) {
+    const { streamUrl, cookie, referer, origin, drmUrl, userAgentType, customUA, drmScheme, customHeaders } = opts;
+
+    shaka.polyfill.installAll();
+    if (!shaka.Player.isBrowserSupported()) throw new Error('Browser not supported');
+
+    if (player) {
+        await player.destroy();
+        player = null;
+        ui = null;
+    }
+
+    const video = document.getElementById('video');
+    const videoContainer = document.querySelector('[data-shaka-player-container]');
+
+    player = new shaka.Player(video);
+    ui = new shaka.ui.Overlay(player, videoContainer, video);
+
+    ui.configure({
+        controlPanelElements: ['play_pause','rewind','fast_forward','time_and_duration','spacer','mute','volume','fullscreen','overflow_menu'],
+        overflowMenuButtons: ['captions','quality','language','playback_rate','picture_in_picture']
+    });
+
+    const config = {
+        streaming: {
+            bufferingGoal: 30,
+            rebufferingGoal: 5,
+            bufferBehind: 30,
+            retryParameters: { timeout: 15000, maxAttempts: 5 }
+        },
+        drm: {}
+    };
+
+    // DRM Configuration
+    if (drmScheme === 'clearkey' && drmUrl) {
+        // Parse kid:key (hex)
+        if (drmUrl.includes(':') && !drmUrl.startsWith('http')) {
+            const parts = drmUrl.split(':');
+            if (parts.length !== 2) throw new Error('ClearKey must be in kid:key hex format');
+            const kidHex = parts[0].trim().replace(/-/g, '');
+            const keyHex = parts[1].trim().replace(/-/g, '');
+            if (kidHex.length !== 32 || keyHex.length !== 32) {
+                throw new Error('ClearKey KID and KEY must each be 32 hex chars (16 bytes)');
+            }
+            config.drm.clearKeys = {};
+            config.drm.clearKeys[kidHex] = keyHex;
+        } else if (drmUrl.startsWith('http')) {
+            config.drm.servers = { 'org.w3.clearkey': drmUrl };
+        }
+    } else if (drmUrl && drmUrl.startsWith('http')) {
+        config.drm.servers = {};
+        if (drmScheme === 'widevine') {
+            config.drm.servers['com.widevine.alpha'] = drmUrl;
+        } else if (drmScheme === 'playready') {
+            config.drm.servers['com.microsoft.playready'] = drmUrl;
+        } else if (drmScheme === 'fairplay') {
+            config.drm.servers['com.apple.fps.1_0'] = drmUrl;
+        }
+    }
+
+    player.configure(config);
+
+    // Determine effective User-Agent
+    let effectiveUA = '';
+    if (userAgentType === 'custom') effectiveUA = customUA;
+    else if (userAgentType && userAgents[userAgentType]) effectiveUA = userAgents[userAgentType];
+
+    // Request filter
+    player.getNetworkingEngine().registerRequestFilter((type, request) => {
+        if (effectiveUA) {
+            try { request.headers['User-Agent'] = effectiveUA; } catch(e) {}
+        }
+        if (referer) {
+            try { request.headers['Referer'] = referer; } catch(e) {}
+        }
+        if (origin) {
+            try { request.headers['Origin'] = origin; } catch(e) {}
+        }
+        if (cookie) {
+            try { request.headers['Cookie'] = cookie; } catch(e) {}
+            request.allowCrossSiteCredentials = true;
+        }
+        // Custom headers
+        if (customHeaders && typeof customHeaders === 'object') {
+            for (const key in customHeaders) {
+                if (Object.prototype.hasOwnProperty.call(customHeaders, key)) {
+                    try { request.headers[key] = String(customHeaders[key]); } catch(e) {}
+                }
+            }
+        }
+    });
+
+    player.addEventListener('error', (event) => {
+        console.error('Player error:', event.detail);
+        const code = event.detail.code;
+        showError('Playback error (code ' + code + '): ' + (event.detail.message || JSON.stringify(event.detail)));
+    });
+
+    const filename = streamUrl.split('/').pop().split('?')[0];
+    document.getElementById('playerTitle').textContent = filename || 'stream';
+
+    await player.load(streamUrl);
+
+    document.getElementById('loadingOverlay').classList.remove('active');
+    document.getElementById('playerModal').classList.add('active');
+
+    video.play().catch(e => console.log('Autoplay prevented:', e));
+}
+
+document.getElementById('closeButton').addEventListener('click', async () => {
+    if (player) {
+        try { await player.destroy(); } catch(e) {}
+        player = null;
+        ui = null;
+    }
+    document.getElementById('playerModal').classList.remove('active');
+    document.getElementById('video').removeAttribute('src');
+    document.getElementById('video').load();
+});
+
+function showError(message) {
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('errorDialog').classList.add('active');
+}
+
+function closeError() {
+    document.getElementById('errorDialog').classList.remove('active');
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        if (document.getElementById('errorDialog').classList.contains('active')) {
+            closeError();
+        } else if (document.getElementById('playerModal').classList.contains('active')) {
+            document.getElementById('closeButton').click();
+        }
+    }
+});
+</script>
+</body>
+</html>
