@@ -1,170 +1,336 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    	<meta name="description" content="You can generate TataPlay playlist on the website; just script & setup in your device & login with registered mobile & OTP.">
-      <meta name="keywords" content="TP, TP live Channel, Tataplay, Tataplay M3u Playlist Generator, TP Account, Denver is Alive, DenverisAlive, Denver1769, free live TV">
-     <meta name="author" content="Denver1769">
-       <meta name="robots" content="index, follow">
-        <meta name="googlebot" content="index, follow">
-        <meta property="og:title" content="TATAPLAY M3u Generate">
-         <meta property="og:description" content="You can generate TataPlay playlist on the website; just script & setup in your device & login with registered mobile & OTP.">
-        <meta property="og:image" content="favicon.ico">
-        <meta property="og:url" content="denverisalive.github.io">
-       <meta property="og:type" content="website">
-       <meta name="twitter:card" content="summary_large_image">
-      <meta name="twitter:title" content="TATAPLAY M3u Generate">
-       <meta name="twitter:description" content="You can generate TataPlay playlist on the website; just script & setup in your device & login with registered mobile & OTP.">
-       <meta name="twitter:image" content="favicon.ico">
-    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-<meta property="og:image:title" content="NO-Ads">
-    <title>Tataplay M3U Generate</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        h4 {
-            text-align: center;
-        }
-        img {
-            display: block;
-            margin: 0 auto;
-        }
-        pre {
-            background: #f4f4f4;
-            padding: 10px;
-            border-radius: 5px;
-            overflow-x: auto;
-        }
-        code {
-            font-family: monospace;
-            font-size: 14px;
-        }
-        a {
-            color: blue;
-            text-decoration: none;
-        }
-        hr {
-            margin-top: 20px;
-        }
-        .badge {
-            display: inline-block;
-            margin: 5px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="description" content="Generate TataPlay M3U Playlist from watch.tataplay.com with 8-Day Catchup Support.">
+<meta name="keywords" content="Tataplay,TataPlay M3U,IPTV,M3U Playlist,Denver1769,TataPlay Catchup,Playlist Generator">
+<meta name="author" content="Denver1769">
+<meta name="robots" content="index,follow">
+
+<meta property="og:title" content="TataPlay M3U Playlist Generator">
+<meta property="og:description" content="Generate TataPlay M3U Playlist with 8-Day Catchup Support.">
+<meta property="og:image" content="favicon.ico">
+<meta property="og:type" content="website">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TataPlay M3U Playlist Generator">
+<meta name="twitter:description" content="Generate TataPlay M3U Playlist with 8-Day Catchup Support.">
+<meta name="twitter:image" content="favicon.ico">
+
+<link rel="shortcut icon" href="favicon.ico">
+
+<title>TataPlay M3U Playlist Generator</title>
+
+<style>
+body{
+font-family:Arial,Helvetica,sans-serif;
+max-width:900px;
+margin:auto;
+padding:20px;
+line-height:1.7;
+background:#fff;
+color:#222;
+}
+
+h1,h2,h3,h4{
+text-align:center;
+}
+
+img{
+display:block;
+margin:auto;
+}
+
+pre{
+background:#f4f4f4;
+padding:12px;
+border-radius:6px;
+overflow:auto;
+}
+
+code{
+font-family:Consolas,monospace;
+}
+
+a{
+color:#0066cc;
+text-decoration:none;
+}
+
+.badge{
+display:inline-block;
+margin:5px;
+}
+
+blockquote{
+background:#fff8dc;
+padding:15px;
+border-left:5px solid orange;
+border-radius:5px;
+}
+
+footer{
+margin-top:30px;
+text-align:center;
+font-size:15px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin:15px 0;
+}
+
+table,th,td{
+border:1px solid #ddd;
+}
+
+th,td{
+padding:10px;
+text-align:center;
+}
+
+th{
+background:#f5f5f5;
+}
+</style>
+
 </head>
+
 <body>
 
-    <p align="center">
-        <img src="https://i.ibb.co/f7fLjcX/Tataplay.png" width="300">
-    </p>
+<p align="center">
+<img src="https://i.ibb.co/f7fLjcX/Tataplay.png" width="280">
+</p>
 
-    <h4>⚡ PHP Script For Generate M3U Playlist from <a href="https://watch.tataplay.com">watch.tataplay.com</a> With 8-Days Catchup</h4>
-    <h4>🌟 If you find it helpful, Consider Giving STAR to This Repository❗</h4>
+<h1>TataPlay M3U Playlist Generator</h1>
 
-    <h2>➡️ Requirements:</h2>
-    <ul>
-        <li><strong>Active Tataplay Account</strong></li>
-        <li><strong>A Working Human Brain</strong></li>
-    </ul>
+<p align="center">
+<strong>
+A PHP script to generate an M3U Playlist from
+<a href="https://watch.tataplay.com" target="_blank">
+watch.tataplay.com
+</a>
+with 8-Day Catchup Support.
+</strong>
+</p>
 
-    <h2>🎯 HOW TO USE</h2>
+<p align="center">
+<a class="badge" href="LICENSE">
+<img src="https://img.shields.io/badge/License-GPL-blue.svg">
+</a>
 
-    <h3>1️⃣ Download PHP Web Server</h3>
-    <ul>
-        <li><strong>Mod APK For Mobiles:</strong> <a href="https://apkmodct.com/ksweb/" target="_blank">KSWEB PRO v3.988</a></li>
-        <li><strong>For PC (Windows):</strong> <a href="https://www.apachefriends.org/download.html" target="_blank">XAMPP</a></li>
-    </ul>
+<a class="badge" href="https://t.me/DenverIsAlivee">
+<img src="https://img.shields.io/badge/Telegram-Join%20Channel-blue?logo=telegram">
+</a>
 
-    <h3>2️⃣ Download and Extract Script</h3>
-    <ul>
-        <li><strong>Download:</strong> <a href="TP_v1.5.zip" target="_blank">TP_v1.5 Script Zip</a></li>
-    </ul>
+<span class="badge">
+<img src="https://img.shields.io/badge/PHP-8.1%2B-purple">
+</span>
+</p>
 
-    <p>Extract all files into the <code>htdocs</code> under <code>TP</code> folder in file manager (path may vary for XAMPP).</p>
-    
-    <pre>
-📂FileManager
-└───📂htdocs/
-     └───📂TP/
-          │────📄Playlist.php
-          ├────📄functions.php
-          ├────📄jwt.php
-          ├────📄play.php
-          └────📄 ....
-    </pre>
+<h3>🌟 If you find this helpful, consider giving this repository a <strong>Star</strong> ⭐</h3>
 
-    <p>Open KSWEB App (or XAMPP for PC) & Start <strong>Localhost Server</strong> & the <strong>APACHE</strong> server.</p>
-    <p>The Setup is Complete, & The Script is Ready to Use.</p>
+<hr>
 
-    <h2>How to Login:</h2>
-    <ul>
-        <li>Open the Login Page (port <code>80</code> for XAMPP): <a href="http://localhost:8000/TP/login.php">http://localhost:8000/TP/login.php</a></li>
-        <li>You can Also Use default IP URL: <a href="http://127.0.0.1:8000/TP/login.php">http://127.0.0.1:8000/TP/login.php</a></li>
-        <li>Or Your Wifi IP URL which is shown in KSweb Home Page top (use port 8000 for mobile & TV, 80 for PC).</li>
-        <li>Login with Your TP Sub ID & enter the OTP received on Your RMN to login.</li>
-    </ul>
-    <p><strong>Note:</strong> The Account You Use Must be <strong>Active</strong>.</p>
+<h2>📋 Requirements</h2>
 
-    <h2>How to Access M3U Playlist:</h2>
-    <p>In Tivimate, NS Player & OTT Navigator, use the following Playlist link (port <code>80</code> for XAMPP):</p>
-    
-    <pre>http://localhost:8000/TP/Playlist.m3u</pre>
-    
-    <h2> Or </h2>
-    
-    <pre>http://127.0.0.1:8000/TP/Playlist.m3u</pre>
-    
-    <p>You can also copy the Playlist URL from index.php. Now Enjoy Your Tataplay Channels 🎉.</p>
+<ul>
+<li><strong>Active TataPlay Subscription</strong></li>
+<li><strong>A Working Human Brain 🧠</strong></li>
+</ul>
 
-    <h2>Script Features:</h2>
-    <ul>
-        <li>All TATAPLAY Channels</li>
-        <li>Multi-Quality Streaming</li>
-        <li>Easy as Plug & Play</li>
-        <li>Works on <strong>All Compatible Platforms</strong></li>
-        <li>Written in Simplest form, Good for understanding and performing Authentication Process in PHP</li>
-    </ul>
-    
-    <h2>Note :</h2>
-    <ul>
-        <li>Max device limit 4</li>
-    </ul>
+<hr>
 
-    <h2>Advanced Features:</h2>
-    <ul>
-        <li><strong>8 Days Catchup Support</strong> for available channels</li>
-        <li>Automatically Extracts Required Tokens</li>
-        <li>Well-Structured Cache System</li>
-    </ul>
+<h2>🚀 Getting Started</h2>
 
-    <h2>Warnings:</h2>
-    <ul>
-        <li>This is for Educational Purposes Only</li>
-        <li>Do not sell this script, it is 💯% Free</li>
-    </ul>
+<h3>Step 1 — Set Up a Local PHP Server</h3>
 
-    <hr>
-    <p>
-        <a class="badge" href="LICENSE.txt"><img src="https://img.shields.io/badge/License-GPL-blue.svg" alt="License: GPL"></a>
-        <a class="badge" href="https://t.me/DenverIsAlivee"><img src="https://img.shields.io/badge/Telegram-Join%20Channel-blue?logo=telegram" alt="Telegram"></a>
-        <a class="badge"><img src="https://img.shields.io/badge/PHP-7.4%2B-purple" alt="PHP"></a>
-    </p>
+<table>
+<tr>
+<th>Platform</th>
+<th>Tool</th>
+<th>Download</th>
+</tr>
 
-    <blockquote>
-        ⚠️ <strong>Disclaimer:</strong> This project is for educational purposes only to demonstrate authentication and IPTV streaming mechanics. 
-        I am not responsible for any misuse of the code that may cause revenue loss to the concerned parties and owners of these services. 
-        This code is protected under the <a href="LICENSE.txt">GPL</a> license.
-    </blockquote>
+<tr>
+<td>📱 Android</td>
+<td>KSWEB PRO v3.988</td>
+<td><a href="https://apkmodct.com/ksweb/" target="_blank">Download APK</a></td>
+</tr>
 
-    <hr>
-    <footer>
-        <p align="center">© 2022-25 @Denver1769</p>
-    </footer>
+<tr>
+<td>💻 Windows</td>
+<td>XAMPP / Autho IPTV</td>
+<td><a href="https://www.apachefriends.org/download.html" target="_blank">Download</a></td>
+</tr>
+
+</table>
+
+<hr>
+
+<h3>Step 2 — Download & Extract Script</h3>
+
+<p>
+<strong>
+<a href="https://github.com/DenverIsAlive/TP/archive/refs/heads/main.zip">
+⬇️ Download Script ZIP
+</a>
+</strong>
+</p>
+
+<p>
+Extract all files inside <code>htdocs</code> into a folder named
+<strong>tataplay</strong>.
+</p>
+
+<pre>
+📂 FileManager
+└── 📂 htdocs/
+    └── 📂 tataplay/
+        ├── .htaccess
+        ├── functions.php
+        ├── hmac.php
+        ├── index.php
+        └── ...
+</pre>
+
+<p>
+Start Apache from KSWEB (Android) or XAMPP (Windows).
+Your setup is now complete.
+</p>
+
+<hr>
+
+<h3>Step 3 — Login</h3>
+
+<p>
+Open:
+</p>
+
+<pre>http://localhost:8000/tataplay/login.php</pre>
+
+<p>or</p>
+
+<pre>http://127.0.0.1:8000/tataplay/login.php</pre>
+
+<p>
+For Android/TV, you can also use your Wi-Fi IP shown in KSWEB.
+Use port <strong>8000</strong>.
+For Windows use port <strong>80</strong>.
+</p>
+
+<p>
+Login using your TataPlay Subscriber ID and verify using OTP.
+</p>
+
+<p><strong>Note:</strong> Your TataPlay subscription must be active.</p>
+
+<hr>
+
+<h3>Step 4 — Access Playlist</h3>
+
+<p>
+Use this playlist URL in
+<strong>TiviMate</strong>,
+<strong>NS Player</strong>,
+<strong>OTT Navigator</strong>,
+or any IPTV player.
+</p>
+
+<pre>http://localhost:8000/tataplay/Playlist.m3u</pre>
+
+<p>
+For PC (Autho IPTV or other players):
+</p>
+
+<pre>http://localhost:80/tataplay/Playlist.m3u</pre>
+
+<p>
+You can also copy the playlist URL directly from
+<code>index.php</code>.
+</p>
+
+<hr>
+
+<h2>✨ Features</h2>
+
+<h3>Core Features</h3>
+
+<ul>
+<li>📺 All TataPlay Channels</li>
+<li>🎬 Multi-Quality Streaming</li>
+<li>🔌 Plug & Play</li>
+<li>🌐 Works on All IPTV Players</li>
+<li>📖 Simple PHP Code for Learning Authentication Flow</li>
+</ul>
+
+<h3>Advanced Features</h3>
+
+<ul>
+<li>⏪ 8-Day Catchup Support</li>
+<li>🔑 Automatic Token Extraction</li>
+<li>🗃️ Smart Cache System</li>
+<li>🛡️ DRM Key Support for Selected Channels</li>
+</ul>
+
+<hr>
+
+<h2>⚠️ Warnings</h2>
+
+<ul>
+<li>Educational Purposes Only</li>
+<li>Do NOT Sell This Script</li>
+<li>Use Only With Your Own Active TataPlay Account</li>
+</ul>
+
+<hr>
+
+<h2>📄 Disclaimer</h2>
+
+<blockquote>
+
+This project is for educational purposes only and demonstrates authentication and IPTV streaming mechanisms using PHP.
+
+The author is not responsible for misuse of this project or any revenue loss caused to the respective service providers.
+
+This project is licensed under the GPL License.
+
+</blockquote>
+
+<hr>
+
+<p align="center">
+
+<a class="badge" href="LICENSE">
+<img src="https://img.shields.io/badge/License-GPL-blue.svg">
+</a>
+
+<a class="badge" href="https://t.me/DenverIsAlivee">
+<img src="https://img.shields.io/badge/Telegram-Join%20Channel-blue?logo=telegram">
+</a>
+
+<span class="badge">
+<img src="https://img.shields.io/badge/PHP-8.1%2B-purple">
+</span>
+
+</p>
+
+<footer>
+
+Made with ❤️ by
+<a href="https://t.me/DenverIsAlivee">@Denver1769</a>
+
+<br><br>
+
+© 2022–26
+
+</footer>
+
+<!-- DO NOT REMOVE THIS CREDIT -->
+<!-- © 2022-26 @Denver1769 -->
+
 </body>
 </html>
