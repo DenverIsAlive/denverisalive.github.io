@@ -4,70 +4,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Opening App...</title>
+<title>Open App</title>
+
 <style>
+* {
+    box-sizing: border-box;
+}
+
 body {
-    background: #111;
-    color: white;
-    font-family: Arial, sans-serif;
-    display: grid;
-    place-items: center;
-    min-height: 100vh;
     margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #101114;
+    color: #fff;
+    font-family: Arial, sans-serif;
 }
-a {
-    color: #00d4ff;
+
+.container {
+    width: 90%;
+    max-width: 400px;
+    padding: 25px;
+    text-align: center;
+    background: #1c1d22;
+    border-radius: 15px;
 }
+
+button {
+    width: 100%;
+    padding: 14px;
+    border: 0;
+    border-radius: 8px;
+    background: #1685ff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#status {
+    color: #bbb;
+    font-size: 14px;
+    margin: 15px 0;
+}
+
 </style>
 </head>
+
 <body>
 
-<div>
-    <h3>Opening App...</h3>
-    <p id="status">Please wait.</p>
-    <a id="openLink" href="#" style="display:none">Tap here to open</a>
+<div class="container">
+    <h2>Opening App</h2>
+    <p id="status">Preparing your link...</p>
+    <button id="openBtn" style="display:none">
+        Open in App
+    </button>
 </div>
 
 <script>
 (function () {
-    const params = new URLSearchParams(location.search);
+
+    const params = new URLSearchParams(window.location.search);
+
     const streamUrl = params.get('url');
     const packageName = params.get('package') || 'com.ns.player';
+
     const status = document.getElementById('status');
-    const link = document.getElementById('openLink');
+    const button = document.getElementById('openBtn');
 
     if (!streamUrl) {
-        status.textContent = 'Missing URL parameter.';
+        status.textContent = 'Error: URL parameter is missing.';
         return;
     }
 
     try {
-        const parsed = new URL(streamUrl);
 
-        if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
-            throw new Error('Invalid URL');
+        const parsedUrl = new URL(streamUrl);
+
+        if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+            throw new Error('Invalid URL protocol');
         }
 
         if (!/^[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)+$/.test(packageName)) {
             throw new Error('Invalid package name');
         }
 
+        // Convert URL into Android Intent format.
+        // URLSearchParams already decodes the incoming URL once.
         const intentUrl =
-            'intent://' + streamUrl.replace(/^https?:\/\//i, '') +
-            '#Intent;scheme=' + parsed.protocol.slice(0, -1) +
-            ';package=' + packageName + ';end';
+            'intent://' +
+            streamUrl.replace(/^https?:\/\//i, '') +
+            '#Intent;scheme=' +
+            parsedUrl.protocol.replace(':', '') +
+            ';package=' +
+            packageName +
+            ';end';
 
-        link.href = intentUrl;
-        link.style.display = 'inline';
-        link.textContent = 'Open in App';
+        status.textContent = 'Redirecting to app...';
 
-        status.textContent = 'Redirecting...';
+        button.style.display = 'block';
 
-        location.href = intentUrl;
+        button.onclick = function () {
+            window.location.href = intentUrl;
+        };
+
+        // Automatic redirect
+        window.location.href = intentUrl;
 
     } catch (error) {
-        status.textContent = 'Invalid URL or package name.';
+
+        status.textContent = 'Error: ' + error.message;
+
     }
+
 })();
 </script>
 
